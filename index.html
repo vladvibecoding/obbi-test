@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <title>+1 скорость побега обезьяны</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #8fc7ff;
+        font-family: system-ui, sans-serif;
+        /* Палец не должен прокручивать страницу и вызывать лупу. */
+        touch-action: none;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+      #game {
+        display: block;
+        width: 100vw;
+        /* Браузер без dvh отбросил бы правило целиком, и холст остался бы
+           полосой в пропорции своих атрибутов. */
+        height: 100vh;
+        height: 100dvh;
+      }
+      #ui {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+      }
+      /*
+       * Без веса селектора: слой, которому касания не нужны, выключает их своим
+       * классом. С весом id правило перебивало класс, и слой подсказок во весь
+       * экран ловил пальцы раньше стика, прыжка и обзора.
+       */
+      :where(#ui > *) {
+        pointer-events: auto;
+      }
+      /*
+       * Заставка видна раньше, чем скачается код игры: разметка и правила
+       * лежат здесь, картинки догружаются сами, и без них видны название,
+       * полоса и цвета мира. Всё движение — сдвиг, поворот и прозрачность:
+       * такие анимации браузер ведёт сам, и они не замирают, пока код занят
+       * сборкой мира. Мера `--u` — сотая ширины кадра 16:9, вписанного в
+       * экран: ПК и телефон показывают одно и то же.
+       */
+      /* Rubik Black и Baloo 2 под его именем для хинди, SIL Open Font License 1.1
+         (assets/fonts/OFL.txt). Наборы букв те же, что в interface.css. */
+      @font-face { font-family: "Rubik"; font-style: normal; font-weight: 900; font-display: block; src: url("./assets/rubik-arabic-900-BlFPXU8J.woff2") format("woff2"); unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC; }
+      @font-face { font-family: "Rubik"; font-style: normal; font-weight: 900; font-display: block; src: url("./assets/baloo2-devanagari-800-BURIY0wZ.woff2") format("woff2"); unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+20F0, U+25CC, U+A830-A839, U+A8E0-A8FF; }
+      @font-face { font-family: "Rubik"; font-style: normal; font-weight: 900; font-display: block; src: url("./assets/rubik-latin-ext-900-D9eDGkk2.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+      @font-face { font-family: "Rubik"; font-style: normal; font-weight: 900; font-display: block; src: url("./assets/rubik-cyrillic-900-jlxVC9Lu.woff2") format("woff2"); unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+      @font-face { font-family: "Rubik"; font-style: normal; font-weight: 900; font-display: block; src: url("./assets/rubik-latin-900-Cz6GdZLE.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+      #loading {
+        --u: min(1vw, 1.7778vh);
+        --ink: #101014;
+        /* Цвета джунглей, пока вход игры не назвал мир. */
+        --sky1: #43d873;
+        --sky2: #0c7f44;
+        --ray: #ffffff24;
+        --accent: #ffd23f;
+        --accent2: #ff9a1f;
+        position: fixed;
+        inset: 0;
+        z-index: 200;
+        overflow: hidden;
+        background: var(--sky2);
+        color: #fff;
+        font-family: "Rubik", "Trebuchet MS", Arial, sans-serif;
+        font-weight: 900;
+        font-synthesis: weight;
+        transition: opacity 0.5s, scale 0.5s;
+      }
+      #loading[data-world="sands"] { --sky1: #ffd257; --sky2: #f07c1c; --ray: #ffffff33; --accent: #35d2ff; --accent2: #0a8bd2; }
+      #loading[data-world="void"] { --sky1: #9b6bff; --sky2: #24105e; --ray: #ffffff22; --accent: #3ff0ff; --accent2: #0aa6c8; }
+      #loading.done { opacity: 0; scale: 1.06; pointer-events: none; }
+      #loading .outlined { paint-order: stroke fill; -webkit-text-stroke: calc(var(--u) * 0.55) var(--ink); text-shadow: 0 calc(var(--u) * 0.35) 0 #0006; }
+      #loading .ls-bg { position: absolute; inset: 0; background: radial-gradient(circle at 50% 42%, #ffffff55 0, transparent 34%), radial-gradient(circle at 50% 42%, var(--sky1) 0, var(--sky2) 78%); }
+      /* Снимок хаба под дымкой. Без названного мира снимка нет: чужой не качается. */
+      #loading .c-shot { position: absolute; inset: -4%; background: center / cover no-repeat; filter: blur(calc(var(--u) * 0.5)) saturate(1.25); scale: 1.08; animation: ls-pan 22s ease-in-out infinite alternate; }
+      #loading[data-world="jungle"] .c-shot { background-image: url("./assets/travel-1-Ww5USIBH.webp"); }
+      #loading[data-world="sands"] .c-shot { background-image: url("./assets/travel-2-D-u0vOOT.webp"); }
+      #loading .c-tint { position: absolute; inset: 0; background: radial-gradient(circle at 50% 46%, transparent 0, color-mix(in srgb, var(--sky2) 70%, transparent) 70%), linear-gradient(transparent 55%, #000a); }
+      #loading .c-rays { position: absolute; left: 50%; top: 42%; width: calc(var(--u) * 260); aspect-ratio: 1; border-radius: 50%; translate: -50% -50%; background: repeating-conic-gradient(var(--ray) 0 7.5deg, transparent 7.5deg 15deg); opacity: 0.45; animation: ls-spin 48s linear infinite; }
+      #loading .title { position: absolute; left: 50%; top: 5%; translate: -50% 0; scale: 0.62; transform-origin: 50% 0; text-align: center; line-height: 0.95; white-space: nowrap; animation: ls-bob 2.6s ease-in-out infinite; }
+      #loading .title > span { display: block; paint-order: stroke fill; -webkit-text-stroke: calc(var(--u) * 1.15) var(--ink); text-shadow: 0 calc(var(--u) * 0.75) 0 #00000070; }
+      #loading .title .line1 { font-size: calc(var(--u) * 9.4); color: #fff; }
+      #loading .title .line2 { margin-top: calc(var(--u) * 0.4); font-size: calc(var(--u) * 5.4); color: var(--accent); }
+      #loading .title .plus { position: absolute; left: calc(var(--u) * -10); top: calc(var(--u) * -2.2); padding: 0 calc(var(--u) * 1.3) calc(var(--u) * 0.25); border: calc(var(--u) * 0.55) solid var(--ink); border-radius: calc(var(--u) * 2); background: linear-gradient(#ff7a5c, #e5241b 60%, #b3120c); box-shadow: inset 0 calc(var(--u) * 0.45) #fff8, 0 calc(var(--u) * 0.6) 0 #0006; color: #fff; font-size: calc(var(--u) * 6.4); -webkit-text-stroke: calc(var(--u) * 0.8) var(--ink); rotate: -11deg; animation: ls-pop 1.3s ease-in-out infinite; }
+      /* Колонны витрины: лента из двух одинаковых половин уезжает вверх на половину, шва нет. */
+      #loading .c-column { position: absolute; top: 0; bottom: 21%; width: calc(var(--u) * 18); overflow: hidden; -webkit-mask: linear-gradient(transparent, #000 16%, #000 84%, transparent); mask: linear-gradient(transparent, #000 16%, #000 84%, transparent); }
+      #loading .c-column.left { left: calc(50% - var(--u) * 47); }
+      #loading .c-column.right { right: calc(50% - var(--u) * 47); }
+      #loading .c-strip { display: flex; flex-direction: column; align-items: center; gap: calc(var(--u) * 2.6); padding-top: calc(var(--u) * 2.6); animation: ls-rise 20s linear infinite; }
+      #loading .c-column.right .c-strip { animation-duration: 24s; }
+      #loading .c-tile { flex: none; display: grid; place-items: center; width: calc(var(--u) * 11.5); aspect-ratio: 1; border: calc(var(--u) * 0.55) solid var(--ink); border-radius: calc(var(--u) * 2.2); background: radial-gradient(circle at 50% 30%, #fff, #dfe9f5 70%); box-shadow: inset 0 calc(var(--u) * -0.8) 0 #0002, 0 0 calc(var(--u) * 2.4) color-mix(in srgb, var(--glow) 75%, transparent); rotate: -4deg; }
+      #loading .c-tile:nth-child(even) { rotate: 4deg; }
+      /* Картинка проявляется, когда догрузилась; до того в колонне едет пустая карточка. */
+      #loading .c-tile img { width: 86%; height: 86%; object-fit: contain; opacity: 0; scale: 0.6; transition: opacity 0.3s, scale 0.45s cubic-bezier(.3, 1.6, .5, 1); }
+      #loading .c-tile img.ready { opacity: 1; scale: 1; }
+      #loading .c-pad { position: absolute; left: 50%; bottom: 23%; width: calc(var(--u) * 30); height: calc(var(--u) * 6); translate: -50% 0; border-radius: 50%; background: radial-gradient(ellipse, #ffffff70 0, transparent 70%); }
+      #loading .c-hero { position: absolute; left: 50%; bottom: 25.5%; width: calc(var(--u) * 32); translate: -50% 0; }
+      #loading .c-hero::before { content: ""; position: absolute; left: 50%; top: 55%; width: 150%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; background: radial-gradient(circle, #ffffffb0 0, #ffffff40 38%, transparent 68%); }
+      /* Лента бега настоящей модели в двенадцать кадров едет ступенями, кадр за кадром. */
+      #loading .g-sprite { position: relative; width: 100%; aspect-ratio: 1; margin-bottom: calc(var(--u) * -3); overflow: hidden; }
+      #loading .g-sprite img { position: absolute; left: 0; top: 0; width: 1200%; height: 100%; max-width: none; animation: ls-frames 0.5s steps(12) infinite; }
+      #loading .sparkles i { position: absolute; width: calc(var(--u) * 1.6); aspect-ratio: 1; background: #fff; clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); opacity: 0; animation: ls-sparkle 2.4s ease-in-out infinite; }
+      #loading .candy { position: absolute; left: 50%; bottom: 13%; width: calc(var(--u) * 64); height: calc(var(--u) * 6.4); translate: -50% 0; overflow: hidden; border: calc(var(--u) * 0.6) solid var(--ink); border-radius: 99px; background: #0b111acc; box-shadow: 0 calc(var(--u) * 0.8) 0 #0007, inset 0 calc(var(--u) * 0.5) 0 #0006; }
+      /* Леденец заливается обрезкой: `--p` — пройденная доля загрузки. */
+      #loading .candy-fill { position: absolute; inset: 0; overflow: hidden; border-radius: 99px; clip-path: inset(0 calc((1 - var(--p, 0)) * 100%) 0 0 round 99px); transition: clip-path 0.35s ease-out; }
+      #loading .candy-fill::after { content: ""; position: absolute; left: 1%; right: 1%; top: 10%; height: 34%; border-radius: 99px; background: #ffffff75; }
+      #loading .stripes { position: absolute; top: 0; bottom: 0; left: 0; width: calc(100% + var(--u) * 6); background: repeating-linear-gradient(90deg, var(--accent) 0 calc(var(--u) * 3), var(--accent2) calc(var(--u) * 3) calc(var(--u) * 6)); animation: ls-candy 0.6s linear infinite; }
+      #loading .candy-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: calc(var(--u) * 1.4); font-size: calc(var(--u) * 2.9); white-space: nowrap; }
+      #loading .percent { font-variant-numeric: tabular-nums; }
+      /* Совет — всегда одной строкой: длину держит проверка строк в игре. Пока вход его не выбрал, плашки нет. */
+      #loading .tip { position: absolute; left: 50%; bottom: 3.2%; display: flex; align-items: center; gap: var(--u); max-width: 96%; padding: calc(var(--u) * 0.6) calc(var(--u) * 1.8) calc(var(--u) * 0.7); translate: -50% 0; border: calc(var(--u) * 0.3) solid #0007; border-radius: 999px; background: #00000059; font-size: calc(var(--u) * 1.9); white-space: nowrap; paint-order: stroke fill; -webkit-text-stroke: calc(var(--u) * 0.4) var(--ink); opacity: 0; transition: opacity 0.35s; }
+      #loading .tip.on { opacity: 1; }
+      #loading .tip b { color: var(--accent); }
+      #loading .tip-text { transition: opacity 0.35s; }
+      #loading .tip-text.fading { opacity: 0; }
+      /* Первого кадра не будет: полоса и совет уступают место причине и повтору. */
+      #loading .fail { position: absolute; left: 50%; bottom: 8%; display: none; box-sizing: border-box; width: min(calc(var(--u) * 64), 92vw); padding: calc(var(--u) * 1.6) calc(var(--u) * 2.4); translate: -50% 0; border: calc(var(--u) * 0.5) solid var(--ink); border-radius: calc(var(--u) * 2.4); background: #0b111aee; font-size: max(14px, calc(var(--u) * 2.2)); line-height: 1.3; text-align: center; }
+      #loading .fail p { margin: 0; }
+      #loading .fail button { margin-top: 12px; min-height: 44px; padding: 8px 22px; border: calc(var(--u) * 0.45) solid var(--ink); border-radius: 99px; background: var(--accent); color: var(--ink); font: inherit; cursor: pointer; }
+      #loading.failed .fail { display: block; }
+      #loading.failed .candy,
+      #loading.failed .tip { display: none; }
+      @keyframes ls-pan { to { transform: translateX(-3%) scale(1.05); } }
+      @keyframes ls-spin { to { rotate: 360deg; } }
+      @keyframes ls-bob { 50% { transform: translateY(calc(var(--u) * -0.8)) rotate(-1deg); } }
+      @keyframes ls-pop { 50% { scale: 1.13; } }
+      @keyframes ls-rise { to { transform: translateY(-50%); } }
+      @keyframes ls-frames { to { transform: translateX(-100%); } }
+      @keyframes ls-sparkle { 0%, 100% { opacity: 0; scale: 0.3; rotate: 0deg; } 50% { opacity: 1; scale: 1; rotate: 90deg; } }
+      @keyframes ls-candy { to { transform: translateX(calc(var(--u) * -6)); } }
+      @media (prefers-reduced-motion: reduce) {
+        #loading *, #loading *::before, #loading *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; }
+      }
+    </style>
+    <script type="module" crossorigin src="./assets/index-DlHBN7Nw.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/packed-dj3t_9Gk.js">
+    <link rel="modulepreload" crossorigin href="./assets/yandex-payments-DxhejERe.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-BSHG7O-1.js">
+    <link rel="modulepreload" crossorigin href="./assets/three.core-DVTiNhEy.js">
+    <link rel="modulepreload" crossorigin href="./assets/src-Dg8799Sg.js">
+    <link rel="modulepreload" crossorigin href="./assets/src-CYnsQS_r.js">
+    <link rel="modulepreload" crossorigin href="./assets/src-BI6MMqKu.js">
+    <link rel="modulepreload" crossorigin href="./assets/BufferGeometryUtils-pFWRFHdl.js">
+    <link rel="modulepreload" crossorigin href="./assets/tail-field-D7RgIifh.js">
+    <link rel="modulepreload" crossorigin href="./assets/volcano-b4zzXu61.js">
+    <link rel="preload" as="fetch" crossorigin href="./assets/01-world-jungle-DEMxJepi.json.gz">
+  </head>
+  <body>
+    <canvas id="game"></canvas>
+    <div id="ui"></div>
+    <div id="loading">
+      <div class="ls-bg"></div>
+      <div class="c-shot"></div>
+      <div class="c-tint"></div>
+      <div class="c-rays"></div>
+      <div class="title"><span class="plus">+1</span><span class="line1">СКОРОСТЬ</span><span class="line2">ПОБЕГА ОБЕЗЬЯНЫ</span></div>
+      <div class="c-column left">
+        <div class="c-strip">
+          <div class="c-tile" style="--glow:#ff9a1f"><img src="./assets/tail-fox-Bf6163lq.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ff5cf0"><img src="./assets/royal-chest-DM0UnndJ.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ffd23f"><img src="./assets/golden-monkey-idol-4SIjsjSv.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#35d2ff"><img src="./assets/treadmill-100-cQqs4_DM.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ff5cf0"><img src="./assets/aura-rainbow-CeF7XGb6.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#5ee36a"><img src="./assets/potion-speed-60-ByRJ6dIj.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#35d2ff"><img src="./assets/pharaoh-mask-BesDDKmR.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ffd23f"><img src="./assets/wins-x2-B5skYqSJ.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ff9a1f"><img src="./assets/tail-fox-Bf6163lq.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ff5cf0"><img src="./assets/royal-chest-DM0UnndJ.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ffd23f"><img src="./assets/golden-monkey-idol-4SIjsjSv.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#35d2ff"><img src="./assets/treadmill-100-cQqs4_DM.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ff5cf0"><img src="./assets/aura-rainbow-CeF7XGb6.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#5ee36a"><img src="./assets/potion-speed-60-ByRJ6dIj.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#35d2ff"><img src="./assets/pharaoh-mask-BesDDKmR.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ffd23f"><img src="./assets/wins-x2-B5skYqSJ.webp" alt="" fetchpriority="low" decoding="async"></div>
+        </div>
+      </div>
+      <div class="c-column right">
+        <div class="c-strip">
+          <div class="c-tile" style="--glow:#b02cff"><img src="./assets/tail-octopus-BBqmH80b.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ffd23f"><img src="./assets/legend-chest-Cr1Ha8rA.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#35d2ff"><img src="./assets/scarab-CH_2gE1z.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ff5cf0"><img src="./assets/treadmill-500-B0uYz0Pt.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ff7a1f"><img src="./assets/trail-fire-BahpcDM6.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#35d2ff"><img src="./assets/pro-chest-DMQR4tAK.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#5ee36a"><img src="./assets/jungle-heart-DQ-zp5zh.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ffd23f"><img src="./assets/potion-wins-60-DGgw5OSE.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#b02cff"><img src="./assets/tail-octopus-BBqmH80b.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ffd23f"><img src="./assets/legend-chest-Cr1Ha8rA.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#35d2ff"><img src="./assets/scarab-CH_2gE1z.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ff5cf0"><img src="./assets/treadmill-500-B0uYz0Pt.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ff7a1f"><img src="./assets/trail-fire-BahpcDM6.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#35d2ff"><img src="./assets/pro-chest-DMQR4tAK.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#5ee36a"><img src="./assets/jungle-heart-DQ-zp5zh.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ffd23f"><img src="./assets/potion-wins-60-DGgw5OSE.webp" alt="" fetchpriority="low" decoding="async"></div>
+        </div>
+      </div>
+      <div class="c-pad"></div>
+      <div class="c-hero"><div class="g-sprite"><img src="./assets/runner-side-BLCqUVUx.webp" alt=""></div></div>
+      <div class="sparkles">
+        <i style="left:25.8%;top:17.7%;animation-delay:-2.3s"></i>
+        <i style="left:77.3%;top:24.3%;animation-delay:-2s"></i>
+        <i style="left:53.2%;top:21.4%;animation-delay:-0.1s"></i>
+        <i style="left:10.9%;top:67.5%;animation-delay:-0.1s"></i>
+        <i style="left:17%;top:27.1%;animation-delay:-2s"></i>
+        <i style="left:30.4%;top:26.4%;animation-delay:-0.2s"></i>
+        <i style="left:89.8%;top:58.9%;animation-delay:-0.6s"></i>
+        <i style="left:44%;top:75.5%;animation-delay:-0.3s"></i>
+        <i style="left:8.3%;top:58.3%;animation-delay:-1.6s"></i>
+        <i style="left:50%;top:78.4%;animation-delay:-1s"></i>
+        <i style="left:56.5%;top:71.5%;animation-delay:-1.8s"></i>
+        <i style="left:69.9%;top:48.8%;animation-delay:-2s"></i>
+      </div>
+      <div class="candy">
+        <div class="candy-fill"><div class="stripes"></div></div>
+        <div class="candy-text" role="status" aria-live="polite" dir="auto"><span class="outlined label">Обезьяна просыпается…</span><span class="outlined percent">0%</span></div>
+      </div>
+      <div class="tip" dir="auto"><b>Совет</b><span class="tip-text"></span></div>
+      <div class="fail" role="alert" dir="auto"><p class="fail-text"></p><button type="button">Повторить</button></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,2 @@
+//# allFunctionsCalledOnLoad
+function e(){let e=new Int32Array(256),t=0;return{moved(n){if(t===e.length){let n=new Int32Array(t*2);n.set(e),e=n}e[t++]=n},upload(n,r,i){let a=n.itemSize,o=!1,s=-1,c=-1,l=()=>{n.addUpdateRange(s*a,(c-s)*a),o=!0};for(let n=0;n<t;n+=1){let t=e[n];if(t>=i)break;if(s>=0&&t<=c+16){c=Math.max(c,t+1);continue}s>=0&&l(),s=t,c=t+1}return r>=0&&i>r&&(s>=0&&r<=c+16?c=i:(s>=0&&l(),s=r,c=i)),s>=0&&l(),o},clear(){t=0}}}export{e as t};
