@@ -1,5 +1,5 @@
 //# allFunctionsCalledOnLoad
-import{K as e,St as t,c as n,er as r,i,kt as a,wr as o,wt as s}from"./three.core-DVTiNhEy.js";import{Ct as c,Et as l}from"./src-Dg8799Sg.js";import{n as u,r as d}from"./tail-fox-fire-B-tvXzpp.js";var f={high:140,low:70},p={high:110,low:55},m=0,ee=1;function h(e,t,n,r){let i=new a({color:16777215,vertexColors:!0});return i.name=`Comet_Burning_Surface`,i.customProgramCacheKey=()=>`comet-burning-surface-v1`,i.onBeforeCompile=i=>{i.uniforms.cometTime=t,i.uniforms.cometBurning=n,i.uniforms.cometNoise={value:e},i.uniforms.cometScale={value:1/r},i.vertexShader=`attribute float _comet_glow;
+import{K as e,St as t,c as n,er as r,i,kt as a,wr as o,wt as s}from"./three.core-DVTiNhEy.js";import{Ct as c,Et as l}from"./src-DuN5C6VE.js";import{n as u,r as d}from"./tail-fox-fire-B23Qn9fP.js";var f={high:140,low:70},p={high:110,low:55},m=0,ee=1;function h(e,t,n,r){let i=new a({color:16777215,vertexColors:!0});return i.name=`Comet_Burning_Surface`,i.customProgramCacheKey=()=>`comet-burning-surface-v1`,i.onBeforeCompile=i=>{i.uniforms.cometTime=t,i.uniforms.cometBurning=n,i.uniforms.cometNoise={value:e},i.uniforms.cometScale={value:1/r},i.vertexShader=`attribute float _comet_glow;
       attribute float _comet_t;
       attribute float _comet_part;
       uniform float cometScale;

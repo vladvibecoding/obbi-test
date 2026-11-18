@@ -1,0 +1,2 @@
+//# allFunctionsCalledOnLoad
+function e(){return typeof requestAnimationFrame==`function`?new Promise(e=>{let t=setTimeout(e,200);requestAnimationFrame(()=>{clearTimeout(t),setTimeout(e,0)})}):Promise.resolve()}export{e as t};
