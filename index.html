@@ -22,7 +22,9 @@
       }
       #game {
         display: block;
-        width: 100vw;
+        /* Поля --seen-* ставит viewport-fit.ts, когда браузер разложил страницу шире видимой части. */
+        margin-left: var(--seen-left, 0);
+        width: var(--seen-width, 100vw);
         /* Браузер без dvh отбросил бы правило целиком, и холст остался бы
            полосой в пропорции своих атрибутов. */
         height: 100vh;
@@ -31,6 +33,9 @@
       #ui {
         position: fixed;
         inset: 0;
+        left: var(--seen-left, 0);
+        right: auto;
+        width: var(--seen-width, 100%);
         pointer-events: none;
       }
       /*
@@ -142,10 +147,10 @@
         #loading *, #loading *::before, #loading *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; }
       }
     </style>
-    <script type="module" crossorigin src="./assets/index-TINTAluk.js"></script>
+    <script type="module" crossorigin src="./assets/index-daCD4yyG.js"></script>
     <link rel="modulepreload" crossorigin href="./assets/packed-dj3t_9Gk.js">
     <link rel="modulepreload" crossorigin href="./assets/yandex-payments-E0Q4bgiA.js">
-    <link rel="modulepreload" crossorigin href="./assets/main-DT2Zgnli.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-C0DiBOjp.js">
     <link rel="modulepreload" crossorigin href="./assets/three.core-DVTiNhEy.js">
     <link rel="modulepreload" crossorigin href="./assets/src-DuN5C6VE.js">
     <link rel="modulepreload" crossorigin href="./assets/src-DoncRPu-.js">
