@@ -19,6 +19,9 @@
         touch-action: none;
         -webkit-user-select: none;
         user-select: none;
+        /* Долгое касание не открывает меню, страница не тянется и не обновляется жестом. */
+        -webkit-touch-callout: none;
+        overscroll-behavior: none;
       }
       #game {
         display: block;
@@ -97,8 +100,8 @@
       #loading .title .line1 { font-size: calc(var(--u) * 9.4); color: #fff; }
       #loading .title .line2 { margin-top: calc(var(--u) * 0.4); font-size: calc(var(--u) * 5.4); color: var(--accent); }
       #loading .title .plus { position: absolute; left: calc(var(--u) * -10); top: calc(var(--u) * -2.2); padding: 0 calc(var(--u) * 1.3) calc(var(--u) * 0.25); border: calc(var(--u) * 0.55) solid var(--ink); border-radius: calc(var(--u) * 2); background: linear-gradient(#ff7a5c, #e5241b 60%, #b3120c); box-shadow: inset 0 calc(var(--u) * 0.45) #fff8, 0 calc(var(--u) * 0.6) 0 #0006; color: #fff; font-size: calc(var(--u) * 6.4); -webkit-text-stroke: calc(var(--u) * 0.8) var(--ink); rotate: -11deg; animation: ls-pop 1.3s ease-in-out infinite; }
-      /* Колонны витрины: лента из двух одинаковых половин уезжает вверх на половину, шва нет. */
-      #loading .c-column { position: absolute; top: 0; bottom: 21%; width: calc(var(--u) * 18); overflow: hidden; -webkit-mask: linear-gradient(transparent, #000 16%, #000 84%, transparent); mask: linear-gradient(transparent, #000 16%, #000 84%, transparent); }
+      /* Колонны витрины идут через весь экран: лента из трёх одинаковых частей уезжает вверх на одну, шва нет, а двух оставшихся хватает и на высокий экран. */
+      #loading .c-column { position: absolute; top: 0; bottom: 0; width: calc(var(--u) * 18); overflow: hidden; }
       #loading .c-column.left { left: calc(50% - var(--u) * 47); }
       #loading .c-column.right { right: calc(50% - var(--u) * 47); }
       #loading .c-strip { display: flex; flex-direction: column; align-items: center; gap: calc(var(--u) * 2.6); padding-top: calc(var(--u) * 2.6); animation: ls-rise 20s linear infinite; }
@@ -115,7 +118,7 @@
       #loading .g-sprite { position: relative; width: 100%; aspect-ratio: 1; margin-bottom: calc(var(--u) * -3); overflow: hidden; }
       #loading .g-sprite img { position: absolute; left: 0; top: 0; width: 1200%; height: 100%; max-width: none; animation: ls-frames 0.5s steps(12) infinite; }
       #loading .sparkles i { position: absolute; width: calc(var(--u) * 1.6); aspect-ratio: 1; background: #fff; clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); opacity: 0; animation: ls-sparkle 2.4s ease-in-out infinite; }
-      #loading .candy { position: absolute; left: 50%; bottom: 13%; width: calc(var(--u) * 64); height: calc(var(--u) * 6.4); translate: -50% 0; overflow: hidden; border: calc(var(--u) * 0.6) solid var(--ink); border-radius: 99px; background: #0b111acc; box-shadow: 0 calc(var(--u) * 0.8) 0 #0007, inset 0 calc(var(--u) * 0.5) 0 #0006; }
+      #loading .candy { position: absolute; left: 50%; bottom: 13%; width: calc(var(--u) * 64); height: calc(var(--u) * 6.4); translate: -50% 0; overflow: hidden; border: calc(var(--u) * 0.6) solid var(--ink); border-radius: 99px; background: #0b111acc; box-shadow: inset 0 calc(var(--u) * 0.5) 0 #0006; }
       /* Леденец заливается обрезкой: `--p` — пройденная доля загрузки. */
       #loading .candy-fill { position: absolute; inset: 0; overflow: hidden; border-radius: 99px; clip-path: inset(0 calc((1 - var(--p, 0)) * 100%) 0 0 round 99px); transition: clip-path 0.35s ease-out; }
       #loading .candy-fill::after { content: ""; position: absolute; left: 1%; right: 1%; top: 10%; height: 34%; border-radius: 99px; background: #ffffff75; }
@@ -135,31 +138,49 @@
       #loading.failed .fail { display: block; }
       #loading.failed .candy,
       #loading.failed .tip { display: none; }
+      /* Кнопка «Играть» — зелёная, как кнопки игры: кирпичный узор, дыхание и блик. */
+      #loading .play { position: absolute; left: 50%; bottom: 7%; display: none; translate: -50% 0; }
+      #loading .play button { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: calc(var(--u) * 1.3); min-width: calc(var(--u) * 34); padding: calc(var(--u) * 1.5) calc(var(--u) * 4.6) calc(var(--u) * 1.9); overflow: hidden; border: calc(var(--u) * 0.6) solid var(--ink); border-radius: calc(var(--u) * 2.2); background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath d='M8 6h12v12H8z' fill='white' fill-opacity='.1' stroke='%23000' stroke-opacity='.10' stroke-width='2'/%3E%3Cpath d='M8 17V6h11' fill='none' stroke='white' stroke-opacity='.7' stroke-width='3'/%3E%3C/svg%3E") 0 0 / calc(var(--u) * 3.6) calc(var(--u) * 3.6), linear-gradient(#93ff5c, #3fd630 55%, #25a81f); box-shadow: inset 0 0 0 calc(var(--u) * 0.35) #ffffff90, inset 0 calc(var(--u) * -0.9) 0 #00000030, 0 calc(var(--u) * 0.8) 0 #0d4416, 0 calc(var(--u) * 1.4) calc(var(--u) * 2.6) #00000070; color: #fff; font: inherit; font-size: calc(var(--u) * 4.4); cursor: pointer; -webkit-tap-highlight-color: transparent; animation: ls-breathe 1.6s ease-in-out infinite; transition: translate 0.08s, box-shadow 0.08s, filter 0.15s; }
+      #loading .play button::after { content: ""; position: absolute; top: -30%; bottom: -30%; left: -30%; width: 18%; background: linear-gradient(90deg, transparent, #ffffffb0, transparent); rotate: 18deg; animation: ls-shine 2.8s ease-in-out infinite; pointer-events: none; }
+      #loading .play-label { display: block; line-height: 1; letter-spacing: 0.02em; text-transform: uppercase; paint-order: stroke fill; -webkit-text-stroke: calc(var(--u) * 0.6) var(--ink); text-shadow: 0 calc(var(--u) * 0.45) 0 #0006; }
+      #loading .play-icon { display: block; flex: none; width: 0.95em; height: 0.95em; fill: #fff; stroke: var(--ink); stroke-width: 2.6; stroke-linejoin: round; paint-order: stroke fill; }
+      #loading .play button:hover { filter: brightness(1.07); }
+      #loading .play button:active { translate: 0 calc(var(--u) * 0.6); box-shadow: inset 0 0 0 calc(var(--u) * 0.35) #ffffff90, inset 0 calc(var(--u) * -0.9) 0 #00000030, 0 calc(var(--u) * 0.2) 0 #0d4416; }
+      #loading .play button:disabled { cursor: default; filter: saturate(0.7) brightness(0.92); }
+      #loading .play button:disabled,
+      #loading .play button:disabled::after { animation-play-state: paused; }
+      #loading.waiting .play { display: block; }
+      #loading.waiting .candy,
+      #loading.waiting .tip { display: none; }
       @keyframes ls-pan { to { transform: translateX(-3%) scale(1.05); } }
       @keyframes ls-spin { to { rotate: 360deg; } }
       @keyframes ls-bob { 50% { transform: translateY(calc(var(--u) * -0.8)) rotate(-1deg); } }
       @keyframes ls-pop { 50% { scale: 1.13; } }
-      @keyframes ls-rise { to { transform: translateY(-50%); } }
+      @keyframes ls-rise { to { transform: translateY(calc(-100% / 3)); } }
       @keyframes ls-frames { to { transform: translateX(-100%); } }
       @keyframes ls-sparkle { 0%, 100% { opacity: 0; scale: 0.3; rotate: 0deg; } 50% { opacity: 1; scale: 1; rotate: 90deg; } }
       @keyframes ls-candy { to { transform: translateX(calc(var(--u) * -6)); } }
+      @keyframes ls-breathe { 50% { scale: 1.045; } }
+      @keyframes ls-shine { 0%, 50% { translate: 0 0; } 100% { translate: calc(var(--u) * 60) 0; } }
       @media (prefers-reduced-motion: reduce) {
         #loading *, #loading *::before, #loading *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; }
       }
     </style>
-    <script type="module" crossorigin src="./assets/index-daCD4yyG.js"></script>
+    <script type="module" crossorigin src="./assets/index-DC8ruzpl.js"></script>
     <link rel="modulepreload" crossorigin href="./assets/packed-dj3t_9Gk.js">
-    <link rel="modulepreload" crossorigin href="./assets/yandex-payments-E0Q4bgiA.js">
-    <link rel="modulepreload" crossorigin href="./assets/main-C0DiBOjp.js">
+    <link rel="modulepreload" crossorigin href="./assets/loading-DrANhS1C.js">
+    <link rel="modulepreload" crossorigin href="./assets/yandex-payments-PGyB-HQ_.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-DnMezzej.js">
     <link rel="modulepreload" crossorigin href="./assets/three.core-DVTiNhEy.js">
-    <link rel="modulepreload" crossorigin href="./assets/src-DuN5C6VE.js">
-    <link rel="modulepreload" crossorigin href="./assets/src-DoncRPu-.js">
+    <link rel="modulepreload" crossorigin href="./assets/src-BIhDzOTA.js">
+    <link rel="modulepreload" crossorigin href="./assets/src-vkRfRoll.js">
     <link rel="modulepreload" crossorigin href="./assets/src-BI6MMqKu.js">
     <link rel="modulepreload" crossorigin href="./assets/BufferGeometryUtils-pFWRFHdl.js">
+    <link rel="modulepreload" crossorigin href="./assets/bot-roster-DtxSMnGM.js">
     <link rel="modulepreload" crossorigin href="./assets/after-frame-BGEZeqzD.js">
     <link rel="modulepreload" crossorigin href="./assets/tail-field-D7RgIifh.js">
     <link rel="modulepreload" crossorigin href="./assets/volcano-b4zzXu61.js">
-    <link rel="preload" as="fetch" crossorigin href="./assets/01-world-jungle-DEMxJepi.json.gz">
+    <link rel="preload" as="fetch" crossorigin href="./assets/01-world-jungle-D17g1IKi.json.gz">
   </head>
   <body>
     <canvas id="game"></canvas>
@@ -188,10 +209,26 @@
           <div class="c-tile" style="--glow:#5ee36a"><img src="./assets/potion-speed-60-ByRJ6dIj.webp" alt="" fetchpriority="low" decoding="async"></div>
           <div class="c-tile" style="--glow:#35d2ff"><img src="./assets/pharaoh-mask-BesDDKmR.webp" alt="" fetchpriority="low" decoding="async"></div>
           <div class="c-tile" style="--glow:#ffd23f"><img src="./assets/wins-x2-B5skYqSJ.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ff9a1f"><img src="./assets/tail-fox-Bf6163lq.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ff5cf0"><img src="./assets/royal-chest-DM0UnndJ.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ffd23f"><img src="./assets/golden-monkey-idol-4SIjsjSv.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#35d2ff"><img src="./assets/treadmill-100-cQqs4_DM.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ff5cf0"><img src="./assets/aura-rainbow-CeF7XGb6.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#5ee36a"><img src="./assets/potion-speed-60-ByRJ6dIj.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#35d2ff"><img src="./assets/pharaoh-mask-BesDDKmR.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ffd23f"><img src="./assets/wins-x2-B5skYqSJ.webp" alt="" fetchpriority="low" decoding="async"></div>
         </div>
       </div>
       <div class="c-column right">
         <div class="c-strip">
+          <div class="c-tile" style="--glow:#b02cff"><img src="./assets/tail-octopus-BBqmH80b.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ffd23f"><img src="./assets/legend-chest-Cr1Ha8rA.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#35d2ff"><img src="./assets/scarab-CH_2gE1z.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ff5cf0"><img src="./assets/treadmill-500-B0uYz0Pt.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ff7a1f"><img src="./assets/trail-fire-BahpcDM6.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#35d2ff"><img src="./assets/pro-chest-DMQR4tAK.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#5ee36a"><img src="./assets/jungle-heart-DQ-zp5zh.webp" alt="" fetchpriority="low" decoding="async"></div>
+          <div class="c-tile" style="--glow:#ffd23f"><img src="./assets/potion-wins-60-DGgw5OSE.webp" alt="" fetchpriority="low" decoding="async"></div>
           <div class="c-tile" style="--glow:#b02cff"><img src="./assets/tail-octopus-BBqmH80b.webp" alt="" fetchpriority="low" decoding="async"></div>
           <div class="c-tile" style="--glow:#ffd23f"><img src="./assets/legend-chest-Cr1Ha8rA.webp" alt="" fetchpriority="low" decoding="async"></div>
           <div class="c-tile" style="--glow:#35d2ff"><img src="./assets/scarab-CH_2gE1z.webp" alt="" fetchpriority="low" decoding="async"></div>
@@ -232,6 +269,7 @@
       </div>
       <div class="tip" dir="auto"><b>Совет</b><span class="tip-text"></span></div>
       <div class="fail" role="alert" dir="auto"><p class="fail-text"></p><button type="button">Повторить</button></div>
+      <div class="play" dir="auto"><button type="button"><svg class="play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg><span class="play-label">Играть</span></button></div>
     </div>
   </body>
 </html>
