@@ -153,6 +153,41 @@
       #loading .play button:disabled { cursor: default; filter: saturate(0.7) brightness(0.92); }
       #loading .play button:disabled,
       #loading .play button:disabled::after { animation-play-state: paused; }
+      /* Полоса, совет, ошибка и «Играть» — одним блоком у нижнего края: совет
+         стоит вплотную под полосой, а не висит отдельно у самого края. */
+      #loading .ls-foot { position: absolute; left: 50%; bottom: 3.2%; translate: -50% 0; display: flex; flex-direction: column; align-items: center; gap: calc(var(--u) * 1.6); width: max-content; max-width: 96%; }
+      #loading .ls-foot > * { position: relative; left: auto; bottom: auto; translate: none; }
+      #loading .ls-foot > :is(.fail, .play) { margin-bottom: calc(var(--u) * 2.5); }
+      #loading .sparkles { position: absolute; inset: 0; pointer-events: none; }
+      /*
+       * Телефон стоя — своя сетка, а не ужатая альбомная. Сверху лента значков,
+       * под ней название; персонаж стоит на блоке полосы и совета, тот — на
+       * нижней ленте. Ленты бегут вбок, значки крупнее: стоя ширины мало, а
+       * высоты много. Пустота остаётся только над персонажем, под лучами.
+       */
+      @media (orientation: portrait) {
+        #loading { --u: 1.6vw; --tile: min(20vw, 11vh); display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto auto; grid-template-columns: minmax(0, 1fr); justify-items: center; box-sizing: border-box; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+        /* Одна колонка: без явной колонки блоки одного ряда (лучи, подставка, герой) встали бы в ряд по неявным колонкам. */
+        #loading > :is(.c-column, .title, .c-rays, .c-pad, .c-hero, .ls-foot) { grid-column: 1; }
+        #loading .c-column { position: relative; grid-row: 1; inset: auto; width: 100%; height: calc(var(--tile) * 1.28); }
+        #loading .c-column.left { left: auto; }
+        #loading .c-column.right { grid-row: 5; right: auto; }
+        #loading .c-strip { flex-direction: row; width: max-content; height: 100%; gap: calc(var(--tile) * 0.16); padding: 0 0 0 calc(var(--tile) * 0.16); animation-name: ls-slide; }
+        #loading .c-column.right .c-strip { animation-direction: reverse; }
+        #loading .c-tile { width: var(--tile); border-width: max(2px, calc(var(--tile) * 0.045)); border-radius: calc(var(--tile) * 0.19); }
+        #loading .title { position: relative; grid-row: 2; left: auto; top: auto; translate: none; scale: 1; margin-top: calc(var(--tile) * 0.06); --u: min(1.2vw, 0.66vh); }
+        #loading .c-rays { grid-row: 3; align-self: end; justify-self: start; position: relative; left: auto; top: auto; translate: none; width: 150vw; margin: 0 0 calc(min(26vw, 15vh) - 75vw) -25vw; }
+        #loading .c-pad { position: relative; grid-row: 3; align-self: end; left: auto; bottom: auto; translate: none; width: min(46vw, 26vh); height: min(9vw, 5vh); margin-bottom: -1vw; }
+        #loading .c-hero { position: relative; grid-row: 3; align-self: end; left: auto; bottom: auto; translate: none; width: min(52vw, 30vh); }
+        #loading .ls-foot { position: relative; grid-row: 4; left: auto; bottom: auto; translate: none; width: 90vw; max-width: 90vw; gap: 2vw; margin: 2vw 0 3vw; }
+        #loading .candy { width: 100%; height: min(12vw, 7vh); }
+        #loading .candy-text { font-size: min(4.2vw, 2.4vh); }
+        #loading .tip { max-width: 100%; box-sizing: border-box; padding: 1.4vw 3.6vw 1.6vw; border-radius: 4vw; font-size: max(13px, min(3.7vw, 2.1vh)); white-space: normal; text-align: center; text-wrap: balance; }
+        #loading .tip-text { min-width: 0; }
+        #loading .ls-foot > :is(.fail, .play) { margin-bottom: 0; }
+        #loading .fail { width: 100%; box-sizing: border-box; }
+      }
+      @keyframes ls-slide { to { transform: translateX(calc(-100% / 3)); } }
       #loading.waiting .play { display: block; }
       #loading.waiting .candy,
       #loading.waiting .tip { display: none; }
@@ -170,20 +205,20 @@
         #loading *, #loading *::before, #loading *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; }
       }
     </style>
-    <script type="module" crossorigin src="./assets/index-vePnXQvD.js"></script>
+    <script type="module" crossorigin src="./assets/index-Dp8ZXI_Y.js"></script>
     <link rel="modulepreload" crossorigin href="./assets/packed-dj3t_9Gk.js">
     <link rel="modulepreload" crossorigin href="./assets/yandex-payments-BmQTK79X.js">
     <link rel="modulepreload" crossorigin href="./assets/texts-B0XKyoB-.js">
     <link rel="modulepreload" crossorigin href="./assets/loading-Cuo60yQc.js">
-    <link rel="modulepreload" crossorigin href="./assets/main-Ck-gwqH-.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-DPOuVipx.js">
     <link rel="modulepreload" crossorigin href="./assets/three.core-DVTiNhEy.js">
-    <link rel="modulepreload" crossorigin href="./assets/src-C9fU5QKU.js">
+    <link rel="modulepreload" crossorigin href="./assets/src-BvRg7gGQ.js">
     <link rel="modulepreload" crossorigin href="./assets/src-C6SwqVEK.js">
     <link rel="modulepreload" crossorigin href="./assets/src-BI6MMqKu.js">
     <link rel="modulepreload" crossorigin href="./assets/BufferGeometryUtils-pFWRFHdl.js">
-    <link rel="modulepreload" crossorigin href="./assets/bot-roster-D7x4pnpm.js">
+    <link rel="modulepreload" crossorigin href="./assets/bot-roster-BFApoeOn.js">
     <link rel="modulepreload" crossorigin href="./assets/after-frame-BGEZeqzD.js">
-    <link rel="modulepreload" crossorigin href="./assets/live-runs-IMtp1OwQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/live-runs-CkoGeccJ.js">
     <link rel="modulepreload" crossorigin href="./assets/tail-field-D7RgIifh.js">
     <link rel="modulepreload" crossorigin href="./assets/volcano-b4zzXu61.js">
     <link rel="preload" as="fetch" crossorigin href="./assets/01-world-jungle-PmnvOUZI.json.gz">
@@ -269,6 +304,7 @@
         <i style="left:56.5%;top:71.5%;animation-delay:-1.8s"></i>
         <i style="left:69.9%;top:48.8%;animation-delay:-2s"></i>
       </div>
+      <div class="ls-foot">
       <div class="candy">
         <div class="candy-fill"><div class="stripes"></div></div>
         <div class="candy-text" role="status" aria-live="polite" dir="auto"><span class="outlined label">Обезьяна просыпается…</span><span class="outlined percent">0%</span></div>
@@ -276,6 +312,7 @@
       <div class="tip" dir="auto"><b>Совет</b><span class="tip-text"></span></div>
       <div class="fail" role="alert" dir="auto"><p class="fail-text"></p><button type="button">Повторить</button></div>
       <div class="play" dir="auto"><button type="button"><svg class="play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg><span class="play-label">Играть</span></button></div>
+      </div>
     </div>
   </body>
 </html>

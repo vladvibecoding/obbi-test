@@ -1,5 +1,5 @@
 //# allFunctionsCalledOnLoad
-import{B as e,K as t,P as n,Q as r,St as i,Tt as a,Xn as o,Z as s,er as c,i as l,s as u,u as d,wr as f,wt as p}from"./three.core-DVTiNhEy.js";import{Ct as m,Et as h}from"./src-C9fU5QKU.js";import{t as g}from"./after-frame-BGEZeqzD.js";var _=60,v=24,y=24,b=12,x=2,ee=1,S=3,C=2,te=93,w=2.4,ne=12,T=[1.86,7.36],re=.42,ie=1.3,ae=.14,oe=0,se=1,ce=2,le=3,ue=4,de=`
+import{B as e,K as t,P as n,Q as r,St as i,Tt as a,Xn as o,Z as s,er as c,i as l,s as u,u as d,wr as f,wt as p}from"./three.core-DVTiNhEy.js";import{Ct as m,Et as h}from"./src-BvRg7gGQ.js";import{t as g}from"./after-frame-BGEZeqzD.js";var _=60,v=24,y=24,b=12,x=2,ee=1,S=3,C=2,te=93,w=2.4,ne=12,T=[1.86,7.36],re=.42,ie=1.3,ae=.14,oe=0,se=1,ce=2,le=3,ue=4,de=`
   #include <common>
   #include <logdepthbuf_pars_vertex>
   attribute vec3 sparkPosition;
