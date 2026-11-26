@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
     />
-    <title>+1 скорость побега обезьяны</title>
+    <title>Обби: +1 к скорости обезьяны</title>
     <style>
       html,
       body {
@@ -97,8 +97,12 @@
       #loading .c-rays { position: absolute; left: 50%; top: 42%; width: calc(var(--u) * 260); aspect-ratio: 1; border-radius: 50%; translate: -50% -50%; background: repeating-conic-gradient(var(--ray) 0 7.5deg, transparent 7.5deg 15deg); opacity: 0.45; animation: ls-spin 48s linear infinite; }
       #loading .title { position: absolute; left: 50%; top: 5%; translate: -50% 0; scale: 0.62; transform-origin: 50% 0; text-align: center; line-height: 0.95; white-space: nowrap; animation: ls-bob 2.6s ease-in-out infinite; }
       #loading .title > span { display: block; paint-order: stroke fill; -webkit-text-stroke: calc(var(--u) * 1.15) var(--ink); text-shadow: 0 calc(var(--u) * 0.75) 0 #00000070; }
-      #loading .title .line1 { font-size: calc(var(--u) * 9.4); color: #fff; }
-      #loading .title .line2 { margin-top: calc(var(--u) * 0.4); font-size: calc(var(--u) * 5.4); color: var(--accent); }
+      /* Название в три строки: мелко «Обби», плашка «+1» у крупной строки, ниже строка цветом мира. */
+      #loading .title .kicker { margin-bottom: calc(var(--u) * 0.8); font-size: calc(var(--u) * 4.2); color: #fff; -webkit-text-stroke-width: calc(var(--u) * 0.8); }
+      /* Плашка стоит у крупной строки, а не у края всего названия: нижняя строка бывает шире. */
+      #loading .title .row { position: relative; width: fit-content; margin-inline: auto; }
+      #loading .title .line1 { display: block; font-size: calc(var(--u) * 9.4); color: #fff; }
+      #loading .title .line2 { margin-top: calc(var(--u) * 0.4); font-size: calc(var(--u) * 6.4); color: var(--accent); }
       #loading .title .plus { position: absolute; left: calc(var(--u) * -10); top: calc(var(--u) * -2.2); padding: 0 calc(var(--u) * 1.3) calc(var(--u) * 0.25); border: calc(var(--u) * 0.55) solid var(--ink); border-radius: calc(var(--u) * 2); background: linear-gradient(#ff7a5c, #e5241b 60%, #b3120c); box-shadow: inset 0 calc(var(--u) * 0.45) #fff8, 0 calc(var(--u) * 0.6) 0 #0006; color: #fff; font-size: calc(var(--u) * 6.4); -webkit-text-stroke: calc(var(--u) * 0.8) var(--ink); rotate: -11deg; animation: ls-pop 1.3s ease-in-out infinite; }
       /* Колонны витрины идут через весь экран: лента из трёх одинаковых частей уезжает вверх на одну, шва нет, а двух оставшихся хватает и на высокий экран. */
       #loading .c-column { position: absolute; top: 0; bottom: 0; width: calc(var(--u) * 18); overflow: hidden; }
@@ -166,23 +170,23 @@
         #loading *, #loading *::before, #loading *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; }
       }
     </style>
-    <script type="module" crossorigin src="./assets/index-Dv9jPs5p.js"></script>
+    <script type="module" crossorigin src="./assets/index-DuYR7TEj.js"></script>
     <link rel="modulepreload" crossorigin href="./assets/packed-dj3t_9Gk.js">
-    <link rel="modulepreload" crossorigin href="./assets/texts-DuOMZnvO.js">
-    <link rel="modulepreload" crossorigin href="./assets/loading-CjPokHKk.js">
-    <link rel="modulepreload" crossorigin href="./assets/yandex-payments-PGyB-HQ_.js">
-    <link rel="modulepreload" crossorigin href="./assets/main-DfAv9L26.js">
+    <link rel="modulepreload" crossorigin href="./assets/yandex-payments-BmQTK79X.js">
+    <link rel="modulepreload" crossorigin href="./assets/texts-B0XKyoB-.js">
+    <link rel="modulepreload" crossorigin href="./assets/loading-Cuo60yQc.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-BOvsHTrE.js">
     <link rel="modulepreload" crossorigin href="./assets/three.core-DVTiNhEy.js">
-    <link rel="modulepreload" crossorigin href="./assets/src-BIhDzOTA.js">
-    <link rel="modulepreload" crossorigin href="./assets/src-vkRfRoll.js">
+    <link rel="modulepreload" crossorigin href="./assets/src-C9fU5QKU.js">
+    <link rel="modulepreload" crossorigin href="./assets/src-C6SwqVEK.js">
     <link rel="modulepreload" crossorigin href="./assets/src-BI6MMqKu.js">
     <link rel="modulepreload" crossorigin href="./assets/BufferGeometryUtils-pFWRFHdl.js">
-    <link rel="modulepreload" crossorigin href="./assets/bot-roster-DtxSMnGM.js">
+    <link rel="modulepreload" crossorigin href="./assets/bot-roster-D7x4pnpm.js">
     <link rel="modulepreload" crossorigin href="./assets/after-frame-BGEZeqzD.js">
-    <link rel="modulepreload" crossorigin href="./assets/live-runs-tP2ZZEjZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/live-runs-IMtp1OwQ.js">
     <link rel="modulepreload" crossorigin href="./assets/tail-field-D7RgIifh.js">
     <link rel="modulepreload" crossorigin href="./assets/volcano-b4zzXu61.js">
-    <link rel="preload" as="fetch" crossorigin href="./assets/01-world-jungle-D17g1IKi.json.gz">
+    <link rel="preload" as="fetch" crossorigin href="./assets/01-world-jungle-PmnvOUZI.json.gz">
   </head>
   <body>
     <canvas id="game"></canvas>
@@ -192,7 +196,7 @@
       <div class="c-shot"></div>
       <div class="c-tint"></div>
       <div class="c-rays"></div>
-      <div class="title"><span class="plus">+1</span><span class="line1">СКОРОСТЬ</span><span class="line2">ПОБЕГА ОБЕЗЬЯНЫ</span></div>
+      <div class="title"><span class="kicker">ОББИ</span><span class="row"><span class="plus">+1</span><span class="line1">К СКОРОСТИ</span></span><span class="line2">ОБЕЗЬЯНЫ</span></div>
       <div class="c-column left">
         <div class="c-strip">
           <div class="c-tile" style="--glow:#ff9a1f"><img src="./assets/tail-fox-Bf6163lq.webp" alt="" fetchpriority="low" decoding="async"></div>
